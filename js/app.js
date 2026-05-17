@@ -154,7 +154,7 @@ function renderAppreciationNote(data, id) {
     if (myPosts.includes(id)) {
         const deleteBtn = document.createElement('button');
         deleteBtn.innerHTML = '×';
-        deleteBtn.style.cssText = 'position: absolute; top: 5px; right: 10px; background: none; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer; padding: 0;';
+        deleteBtn.className = 'delete-card-btn';
         deleteBtn.addEventListener('click', async () => {
             if (confirm("Delete this note?")) {
                 try {

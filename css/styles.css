@@ -1,19 +1,24 @@
 :root {
     /* Color Palette */
-    --body-bg: #111111; /* Dark outer background */
-    --app-bg: #2b1136; /* Deep Purple */
-    --app-bg-secondary: #3b1c4a;
-    --text-primary: #ffffff;
-    --text-secondary: #e2d7e8;
-    --accent-gold: #ffbf00; /* Warm Gold/Amber */
-    --accent-gold-hover: #e5ab00;
-    --border-color: rgba(255, 255, 255, 0.1);
+    --bg-primary: #F9F9F6;
+    --brand-primary: #721422;
+    --accent-gold: #D4AF37;
+    --text-main: #2D2D2D;
+    --card-bg: #FFFFFF;
     
-    /* Vault WhatsApp Theme colors mapped to dark mode/purple */
-    --whatsapp-header: #1f0b26;
-    --whatsapp-bg: #250d2e;
-    --whatsapp-msg: #3b1c4a;
-    --whatsapp-msg-border: #4d2660;
+    --body-bg: #e0e0e0;
+    --app-bg: var(--bg-primary);
+    --app-bg-secondary: #f0f0f0;
+    --text-primary: var(--text-main);
+    --text-secondary: #666666;
+    --accent-gold-hover: #b0912d;
+    --border-color: rgba(0, 0, 0, 0.1);
+    
+    /* Vault WhatsApp Theme colors mapped to new palette */
+    --whatsapp-header: var(--brand-primary);
+    --whatsapp-bg: var(--bg-primary);
+    --whatsapp-msg: var(--card-bg);
+    --whatsapp-msg-border: var(--border-color);
 
     /* Typography */
     --font-heading: 'Playfair Display', serif;
@@ -125,8 +130,8 @@ h1, h2, h3 {
 }
 
 .primary-btn {
-    background-color: var(--accent-gold);
-    color: #000;
+    background-color: var(--brand-primary);
+    color: #FFFFFF;
     border: none;
     padding: 1rem 1.5rem;
     border-radius: 50px;
@@ -135,13 +140,13 @@ h1, h2, h3 {
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     width: 100%;
     display: block;
 }
 
 .primary-btn:hover {
-    background-color: var(--accent-gold-hover);
+    background-color: #5c101b;
 }
 .primary-btn:active {
     transform: scale(0.98);
@@ -149,7 +154,7 @@ h1, h2, h3 {
 
 .secondary-btn {
     background-color: transparent;
-    color: var(--accent-gold);
+    color: var(--brand-primary);
     border: 2px solid var(--accent-gold);
     padding: 1rem 1.5rem;
     border-radius: 50px;
@@ -163,7 +168,7 @@ h1, h2, h3 {
 }
 
 .secondary-btn:hover {
-    background-color: rgba(255, 191, 0, 0.1);
+    background-color: rgba(212, 175, 55, 0.1);
 }
 
 .small-btn {
@@ -204,7 +209,7 @@ h1, h2, h3 {
     align-items: flex-end;
     justify-content: center;
     padding-bottom: var(--spacing-lg);
-    background-color: var(--app-bg-secondary);
+    background-color: var(--brand-primary);
 }
 
 .hero-bg-image {
@@ -213,7 +218,7 @@ h1, h2, h3 {
     background-image: url('../assets/pastor_boye.png'); /* Assumes image exists */
     background-size: cover;
     background-position: center top;
-    opacity: 0.6;
+    opacity: 0.8;
 }
 
 .hero-bg-elongated {
@@ -223,7 +228,7 @@ h1, h2, h3 {
 .header-overlay {
     position: relative;
     z-index: 2;
-    background: linear-gradient(to top, var(--app-bg) 0%, transparent 100%);
+    background: linear-gradient(to top, var(--brand-primary) 0%, transparent 100%);
     width: 100%;
     padding: var(--spacing-xl) var(--spacing-md) 0;
 }
@@ -232,7 +237,8 @@ h1, h2, h3 {
     font-size: 2rem;
     line-height: 1.2;
     margin-bottom: var(--spacing-sm);
-    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    color: #FFFFFF;
 }
 
 .main-title span {
@@ -242,7 +248,7 @@ h1, h2, h3 {
 
 .subtitle {
     font-size: 1.1rem;
-    color: var(--text-secondary);
+    color: #FFFFFF;
     font-weight: 500;
 }
 
@@ -302,8 +308,8 @@ h1, h2, h3 {
     padding: 0.8rem;
     border-radius: 8px;
     border: 1px solid var(--border-color);
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-primary);
+    background: var(--card-bg);
+    color: var(--text-main);
     font-family: var(--font-body);
     font-size: 0.9rem;
 }
@@ -328,10 +334,11 @@ h1, h2, h3 {
 }
 
 .message-card {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--card-bg);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     padding: var(--spacing-md);
     border-radius: 12px;
-    border-left: 4px solid var(--accent-gold);
+    border-left: 4px solid var(--brand-primary);
     transition: background 0.3s ease;
     scroll-snap-align: start;
     height: auto;
@@ -350,16 +357,32 @@ h1, h2, h3 {
     font-size: 0.95rem;
     font-style: italic;
     margin-bottom: var(--spacing-sm);
-    color: var(--text-primary);
+    color: var(--text-main);
     flex: 1;
 }
 
 .message-author {
     font-weight: 600;
-    color: var(--accent-gold);
+    color: var(--brand-primary);
     text-align: right;
     font-size: 0.9rem;
     margin-top: auto;
+}
+
+.delete-card-btn {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s ease;
+}
+.delete-card-btn:hover {
+    color: var(--brand-primary);
 }
 
 /* Media Carousel */
@@ -454,8 +477,8 @@ h1, h2, h3 {
     padding: 0.8rem;
     border-radius: 8px;
     border: 1px solid var(--border-color);
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-primary);
+    background: var(--card-bg);
+    color: var(--text-main);
     font-family: var(--font-body);
 }
 
@@ -530,8 +553,8 @@ h1, h2, h3 {
     border-radius: 8px;
     font-size: 1rem;
     outline: none;
-    background: rgba(255,255,255,0.05);
-    color: #fff;
+    background: var(--card-bg);
+    color: var(--text-main);
     text-align: center;
 }
 
@@ -567,7 +590,7 @@ h1, h2, h3 {
 }
 
 .contact-item:hover {
-    background-color: rgba(255,255,255,0.02);
+    background-color: rgba(0,0,0,0.05);
 }
 
 .contact-info {
@@ -578,7 +601,7 @@ h1, h2, h3 {
     font-size: 1.1rem;
     font-family: var(--font-body);
     margin-bottom: 4px;
-    color: var(--accent-gold);
+    color: var(--brand-primary);
 }
 
 .contact-preview {
@@ -641,7 +664,7 @@ h1, h2, h3 {
 
 .detail-message {
     font-size: 1rem;
-    color: var(--text-primary);
+    color: var(--text-main);
     line-height: 1.5;
 }
 
