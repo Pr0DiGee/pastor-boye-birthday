@@ -223,6 +223,22 @@ formAppreciation.addEventListener('submit', async (e) => {
     if (charCounter) charCounter.textContent = '0/100';
 });
 
+// --- Wall "Peek" Scroll Animation Hint ---
+if (appreciationList) {
+    const wallObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                appreciationList.scrollTo({ left: 120, behavior: 'smooth' });
+                setTimeout(() => {
+                    appreciationList.scrollTo({ left: 0, behavior: 'smooth' });
+                }, 600);
+                observer.disconnect();
+            }
+        });
+    }, { threshold: 0.5 });
+    wallObserver.observe(appreciationList);
+}
+
 // --- Carousel Interactivity ---
 const carouselTrack = document.querySelector('.carousel-track');
 const carouselContainer = document.querySelector('.carousel-container');
