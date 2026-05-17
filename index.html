@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Birthday Pastor Boye!</title>
+    <meta name="description" content="A celebratory page for Pastor Boye's birthday, from Imprint Babcock Cell.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <div class="mobile-wrapper">
+        <div id="app">
+            
+            <!-- View 1: Public Landing Page -->
+            <div id="landing-page" class="view active">
+                <header class="hero-header">
+                    <div class="hero-bg-image hero-bg-elongated"></div>
+                    <div class="header-overlay">
+                        <h1 class="main-title">Happy Birthday<br><span>Pastor Boye!</span></h1>
+                        <p class="subtitle">From Imprint Babcock Cell</p>
+                    </div>
+                </header>
+
+                <section class="hero-media">
+                    <div class="video-container">
+                        <video id="hero-video" poster="assets/group_video_poster.png" muted loop playsinline>
+                            <!-- Placeholder collective video -->
+                            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </section>
+
+                <section class="wall-of-appreciation">
+                    <h2 class="section-title">Wall of Appreciation</h2>
+                    
+                    <div class="appreciation-form-container">
+                        <form id="appreciation-form">
+                            <input type="text" id="appreciation-author" placeholder="Your Name" required>
+                            <textarea id="appreciation-text" placeholder="Write a short appreciation note..." rows="3" required></textarea>
+                            <button type="submit" class="primary-btn small-btn">Post Note</button>
+                        </form>
+                    </div>
+
+                    <!-- Dynamic grid for notes -->
+                    <div class="appreciation-grid" id="appreciation-list">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </section>
+
+                <section class="carousel-section">
+                    <div class="carousel-track">
+                        <img src="assets/carousel_img_1.png" alt="Memory" class="carousel-item">
+                        <img src="assets/carousel_img_2.png" alt="Memory" class="carousel-item">
+                        <img src="assets/carousel_img_3.png" alt="Memory" class="carousel-item">
+                        <img src="assets/carousel_img_4.png" alt="Memory" class="carousel-item">
+                        <!-- Duplicate for infinite scroll loop -->
+                        <img src="assets/carousel_img_1.png" alt="Memory" class="carousel-item">
+                        <img src="assets/carousel_img_2.png" alt="Memory" class="carousel-item">
+                        <img src="assets/carousel_img_3.png" alt="Memory" class="carousel-item">
+                        <img src="assets/carousel_img_4.png" alt="Memory" class="carousel-item">
+                    </div>
+                </section>
+
+                <section class="navigation-section">
+                    <button id="btn-to-upload" class="primary-btn">Send a Personal Message</button>
+                    <button id="btn-to-vault" class="secondary-btn mt-3">View Birthday Wishes</button>
+                </section>
+            </div>
+
+            <!-- View 2: Upload Portal -->
+            <div id="upload-portal" class="view">
+                <div class="portal-header">
+                    <button class="icon-btn btn-back-home" aria-label="Back">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    </button>
+                    <h2>Personal Message</h2>
+                </div>
+                <div class="form-container">
+                    <p class="form-instructions">Share your wishes, a picture, or a short video with Pastor Boye!</p>
+                    <form id="upload-form">
+                        <div class="form-group">
+                            <label for="upload-name">Name *</label>
+                            <input type="text" id="upload-name" required placeholder="Enter your name">
+                        </div>
+                        <div class="form-group">
+                            <label for="upload-message">Short Message</label>
+                            <textarea id="upload-message" rows="4" placeholder="Your birthday wishes..."></textarea>
+                        </div>
+                        <div class="form-group file-group">
+                            <label for="upload-image">Custom Image (Optional)</label>
+                            <input type="file" id="upload-image" accept="image/*">
+                        </div>
+                        <div class="form-group file-group">
+                            <label>Voice Note (Optional)</label>
+                            <div class="audio-recorder">
+                                <button type="button" id="btn-record-audio" class="secondary-btn small-btn">Record Voice Note</button>
+                                <button type="button" id="btn-stop-audio" class="primary-btn small-btn hidden" style="background-color: #ff4444; color: white;">Stop Recording</button>
+                                <canvas id="audio-visualizer" class="hidden mt-3" width="300" height="50" style="width: 100%; height: 50px; background: rgba(255,255,255,0.05); border-radius: 8px;"></canvas>
+                                <audio id="audio-playback" controls class="hidden mt-3" style="width: 100%;"></audio>
+                            </div>
+                        </div>
+                        <div class="form-group file-group">
+                            <label for="upload-video">Video (Optional, Max 30s/30MB)</label>
+                            <input type="file" id="upload-video" accept="video/*">
+                            <small class="file-hint">Strict limit: 30MB maximum file size.</small>
+                        </div>
+                        <div id="upload-error" class="error-msg"></div>
+                        <button type="submit" id="btn-submit-upload" class="primary-btn full-width">Send Message</button>
+                    </form>
+                    
+                    <div id="upload-success" class="success-state hidden">
+                        <div class="success-icon">✓</div>
+                        <h3>Message Sent Successfully!</h3>
+                        <button class="text-btn btn-back-home">Return to Home</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View 3: Vault Login -->
+            <div id="vault-login" class="view">
+                <div class="login-container">
+                    <h2 class="section-title">Private Messages Vault</h2>
+                    <p class="login-desc">Please enter the secure passcode to view all personal wishes.</p>
+                    <div class="input-group">
+                        <input type="password" id="vault-password" placeholder="Passcode">
+                        <button id="btn-login" class="primary-btn">Unlock</button>
+                    </div>
+                    <p id="login-error" class="error-msg"></p>
+                    <button class="text-btn btn-back-home">Back to Home</button>
+                </div>
+            </div>
+
+            <!-- View 4: Vault List (WhatsApp Style - No Avatars) -->
+            <div id="vault-list" class="view">
+                <div class="whatsapp-header">
+                    <button class="icon-btn btn-back-home" aria-label="Back">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    </button>
+                    <h2>Birthday Wishes</h2>
+                </div>
+                <div class="contact-list" id="vault-contact-list">
+                    <!-- Populated dynamically via JS -->
+                    <!-- Example item -->
+                    <div class="contact-item">
+                        <div class="contact-info">
+                            <h3 class="contact-name">Loading...</h3>
+                            <p class="contact-preview">Fetching messages...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View 5: Vault Detail -->
+            <div id="vault-detail" class="view">
+                <div class="whatsapp-header">
+                    <button id="btn-back-to-list" class="icon-btn" aria-label="Back">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    </button>
+                    <h2 id="detail-name">Contact Name</h2>
+                </div>
+                <div class="detail-content">
+                    <div class="detail-media-container">
+                        <!-- Fallback image used if custom image is missing -->
+                        <img id="detail-image" src="" alt="Photo" class="detail-image hidden">
+                    </div>
+                    
+                    <div id="detail-message-container" class="chat-bubble hidden">
+                        <p id="detail-message" class="detail-message"></p>
+                    </div>
+                    
+                    <div id="detail-audio-container" class="media-player hidden">
+                        <audio id="detail-audio" controls>
+                            <source src="" type="audio/mpeg">
+                        </audio>
+                    </div>
+
+                    <div id="detail-video-container" class="media-player hidden">
+                        <video id="detail-video" controls>
+                            <source src="" type="video/mp4">
+                        </video>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Firebase v10 SDK (Module setup) -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
