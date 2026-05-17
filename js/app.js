@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // --- Firebase Configuration ---
 const firebaseConfig = {
@@ -56,7 +56,14 @@ if (heroVideo) {
 const formAppreciation = document.getElementById('appreciation-form');
 const inputApprAuthor = document.getElementById('appreciation-author');
 const inputApprText = document.getElementById('appreciation-text');
+const charCounter = document.getElementById('char-counter');
 const appreciationList = document.getElementById('appreciation-list');
+
+if (inputApprText && charCounter) {
+    inputApprText.addEventListener('input', () => {
+        charCounter.textContent = `${inputApprText.value.length}/150`;
+    });
+}
 
 // Upload Form
 const formUpload = document.getElementById('upload-form');
@@ -86,7 +93,7 @@ const vaultContactList = document.getElementById('vault-contact-list');
 
 // Vault Detail Elements
 const detailName = document.getElementById('detail-name');
-const detailImage = document.getElementById('detail-image');
+const detailImagesContainer = document.getElementById('detail-images-container');
 const detailMessage = document.getElementById('detail-message');
 const detailMessageContainer = document.getElementById('detail-message-container');
 const detailAudioContainer = document.getElementById('detail-audio-container');
@@ -125,34 +132,55 @@ btnsBackHome.forEach(btn => {
 btnBackToList.addEventListener('click', () => switchView(viewVaultList));
 
 // --- 1. Appreciation Wall Logic ---
-function renderAppreciationNote(data, isOptimistic = false) {
+function renderAppreciationNote(data, id) {
     const safeName = escapeHTML(data.author);
     const safeText = escapeHTML(data.text);
     
     const card = document.createElement('div');
-    card.className = `message-card ${isOptimistic ? 'optimistic' : ''}`;
+    card.className = `message-card`;
+    card.style.position = 'relative';
     card.innerHTML = `
         <p class="message-text">"${safeText}"</p>
         <p class="message-author">- ${safeName}</p>
     `;
+
+    // Check if user owns this post via localStorage
+    let myPosts = [];
+    try {
+        const stored = localStorage.getItem('my_wall_posts');
+        if (stored) myPosts = JSON.parse(stored);
+    } catch(e){}
+
+    if (myPosts.includes(id)) {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '×';
+        deleteBtn.style.cssText = 'position: absolute; top: 5px; right: 10px; background: none; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer; padding: 0;';
+        deleteBtn.addEventListener('click', async () => {
+            if (confirm("Delete this note?")) {
+                try {
+                    await deleteDoc(doc(db, 'wall', id));
+                    myPosts = myPosts.filter(postId => postId !== id);
+                    localStorage.setItem('my_wall_posts', JSON.stringify(myPosts));
+                } catch(err) {
+                    console.error("Failed to delete", err);
+                }
+            }
+        });
+        card.appendChild(deleteBtn);
+    }
+
     return card;
 }
 
 // Load approved wall notes (Real-time)
-const wallQuery = query(collection(db, "wall"), orderBy("timestamp", "asc"));
+const wallQuery = query(collection(db, "wall"), orderBy("timestamp", "desc"));
 onSnapshot(wallQuery, (snapshot) => {
-    // Remove all dynamically added notes to prevent duplicates, but keep optimistic ones
-    document.querySelectorAll('.message-card.dynamic-note').forEach(el => {
-        if (!el.classList.contains('optimistic')) el.remove();
-    });
+    appreciationList.innerHTML = '';
     
-    snapshot.forEach((doc) => {
-        const data = doc.data();
-        if (data.approved) {
-            const card = renderAppreciationNote(data);
-            card.classList.add('dynamic-note');
-            appreciationList.prepend(card);
-        }
+    snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const card = renderAppreciationNote(data, docSnap.id);
+        appreciationList.appendChild(card);
     });
 }, (error) => {
     console.error("Error fetching wall messages:", error);
@@ -162,29 +190,37 @@ formAppreciation.addEventListener('submit', async (e) => {
     e.preventDefault();
     const author = inputApprAuthor.value.trim();
     const text = inputApprText.value.trim();
-    if (!author || !text) return;
+    
+    if (text.length === 0 || text.length > 150) {
+        alert("Note must be between 1 and 150 characters.");
+        return;
+    }
+    if (!author) return;
 
     try {
-        await addDoc(collection(db, "wall"), {
+        const docRef = await addDoc(collection(db, "wall"), {
             author: author,
             text: text,
-            approved: false, // Must be approved by admin to show permanently
             timestamp: serverTimestamp()
         });
         
-        // Optimistic UI update (after success)
-        const optimisticData = { author, text };
-        const optimisticCard = renderAppreciationNote(optimisticData, true);
-        optimisticCard.classList.add('dynamic-note');
-        appreciationList.prepend(optimisticCard);
+        let myPosts = [];
+        try {
+            const stored = localStorage.getItem('my_wall_posts');
+            if (stored) myPosts = JSON.parse(stored);
+        } catch(e){}
+        myPosts.push(docRef.id);
+        localStorage.setItem('my_wall_posts', JSON.stringify(myPosts));
 
     } catch (error) {
         console.error("Error adding appreciation note: ", error);
         alert("Failed to post note. Please check your connection.");
     }
+    
     // Clear form
     inputApprAuthor.value = '';
     inputApprText.value = '';
+    if (charCounter) charCounter.textContent = '0/150';
 });
 
 // --- Carousel Interactivity ---
@@ -314,8 +350,14 @@ if (btnRecordAudio && btnStopAudio) {
             };
 
             mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                generatedAudioFile = new File([audioBlob], "voicenote.webm", { type: 'audio/webm' });
+                const mimeType = mediaRecorder.mimeType || 'audio/webm';
+                const audioBlob = new Blob(audioChunks, { type: mimeType });
+                
+                let extension = 'webm';
+                if (mimeType.includes('mp4')) extension = 'mp4';
+                else if (mimeType.includes('ogg')) extension = 'ogg';
+
+                generatedAudioFile = new File([audioBlob], `voicenote.${extension}`, { type: mimeType });
                 const audioUrl = URL.createObjectURL(audioBlob);
                 audioPlayback.src = audioUrl;
                 
@@ -349,7 +391,7 @@ formUpload.addEventListener('submit', async (e) => {
     
     const name = inputUploadName.value.trim();
     const message = inputUploadMessage.value.trim();
-    const imageFile = inputUploadImage.files[0];
+    const imageFiles = Array.from(inputUploadImage.files);
     const audioFile = generatedAudioFile;
     const videoFile = inputUploadVideo.files[0];
 
@@ -377,14 +419,19 @@ formUpload.addEventListener('submit', async (e) => {
     btnSubmitUpload.textContent = 'Uploading... Please wait.';
 
     try {
-        const customImageUrl = imageFile ? await uploadToCloudinary(imageFile) : null;
+        let customImageUrls = [];
+        if (imageFiles.length > 0) {
+            const uploadPromises = imageFiles.map(file => uploadToCloudinary(file));
+            customImageUrls = await Promise.all(uploadPromises);
+        }
+
         const audioUrl = audioFile ? await uploadToCloudinary(audioFile) : null;
         const videoUrl = videoFile ? await uploadToCloudinary(videoFile) : null;
 
         await addDoc(collection(db, "wishes"), {
             name,
             message,
-            customImageUrl,
+            customImageUrls,
             audioUrl,
             videoUrl,
             timestamp: serverTimestamp()
@@ -458,7 +505,7 @@ function initVaultListener() {
             if (!preview) {
                 if (data.videoUrl) preview = "Video message attached";
                 else if (data.audioUrl) preview = "Voice note uploaded";
-                else if (data.customImageUrl) preview = "Image uploaded";
+                else if ((data.customImageUrls && data.customImageUrls.length > 0) || data.customImageUrl) preview = "Image uploaded";
             } else {
                 if (preview.length > 40) preview = preview.substring(0, 40) + "...";
             }
@@ -495,14 +542,36 @@ function openVaultDetail(id) {
         detailMessageContainer.classList.add('hidden');
     }
 
-    // Handle Image
-    let finalImageUrl = data.customImageUrl;
-    if (finalImageUrl) {
-        finalImageUrl = finalImageUrl.replace(/\.heic$/i, '.jpg');
+    // Handle Images
+    detailImagesContainer.innerHTML = '';
+    let images = [];
+    if (data.customImageUrls && Array.isArray(data.customImageUrls)) {
+        images = data.customImageUrls;
+    } else if (data.customImageUrl) {
+        images = [data.customImageUrl];
     }
-    detailImage.classList.remove('hidden');
-    detailImage.src = finalImageUrl ? finalImageUrl : 'assets/pastor_boye.png';
-    detailImage.alt = `Photo for ${data.name}`;
+
+    if (images.length > 0) {
+        detailImagesContainer.classList.remove('hidden');
+        images.forEach(imgUrl => {
+            let finalImageUrl = imgUrl;
+            if (finalImageUrl) {
+                finalImageUrl = finalImageUrl.replace(/\.heic$/i, '.jpg');
+            }
+            const img = document.createElement('img');
+            img.className = 'detail-image';
+            img.src = finalImageUrl;
+            img.alt = `Photo for ${data.name}`;
+            detailImagesContainer.appendChild(img);
+        });
+    } else {
+        detailImagesContainer.classList.remove('hidden');
+        const img = document.createElement('img');
+        img.className = 'detail-image';
+        img.src = 'assets/pastor_boye.png';
+        img.alt = 'Fallback Photo';
+        detailImagesContainer.appendChild(img);
+    }
 
     // Handle Audio
     if (data.audioUrl) {
