@@ -61,7 +61,7 @@ const appreciationList = document.getElementById('appreciation-list');
 
 if (inputApprText && charCounter) {
     inputApprText.addEventListener('input', () => {
-        charCounter.textContent = `${inputApprText.value.length}/150`;
+        charCounter.textContent = `${inputApprText.value.length}/100`;
     });
 }
 
@@ -191,8 +191,8 @@ formAppreciation.addEventListener('submit', async (e) => {
     const author = inputApprAuthor.value.trim();
     const text = inputApprText.value.trim();
     
-    if (text.length === 0 || text.length > 150) {
-        alert("Note must be between 1 and 150 characters.");
+    if (text.length === 0 || text.length > 100) {
+        alert("Note must be between 1 and 100 characters.");
         return;
     }
     if (!author) return;
@@ -220,7 +220,7 @@ formAppreciation.addEventListener('submit', async (e) => {
     // Clear form
     inputApprAuthor.value = '';
     inputApprText.value = '';
-    if (charCounter) charCounter.textContent = '0/150';
+    if (charCounter) charCounter.textContent = '0/100';
 });
 
 // --- Carousel Interactivity ---

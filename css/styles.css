@@ -316,8 +316,16 @@ h1, h2, h3 {
 
 .appreciation-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(3, 1fr);
+    grid-auto-flow: column;
+    grid-auto-columns: calc(50% - (var(--spacing-md) / 2));
     gap: var(--spacing-md);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: var(--spacing-md);
+    mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    scrollbar-width: thin;
 }
 
 .message-card {
@@ -326,6 +334,11 @@ h1, h2, h3 {
     border-radius: 12px;
     border-left: 4px solid var(--accent-gold);
     transition: background 0.3s ease;
+    scroll-snap-align: start;
+    width: 100%;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
 }
 
 .message-card.optimistic {
@@ -334,10 +347,16 @@ h1, h2, h3 {
 }
 
 .message-text {
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-style: italic;
     margin-bottom: var(--spacing-sm);
     color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    flex: 1;
 }
 
 .message-author {
@@ -345,6 +364,7 @@ h1, h2, h3 {
     color: var(--accent-gold);
     text-align: right;
     font-size: 0.9rem;
+    margin-top: auto;
 }
 
 /* Media Carousel */
