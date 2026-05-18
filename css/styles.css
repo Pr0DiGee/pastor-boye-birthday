@@ -450,8 +450,6 @@ h1, h2, h3 {
     gap: var(--spacing-md);
     overflow-x: auto;
     scroll-snap-type: x mandatory;
-    mask-image: linear-gradient(to right, black 85%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
     scrollbar-width: thin;
 }
 
