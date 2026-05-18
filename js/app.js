@@ -537,12 +537,7 @@ function openVaultDetail(id) {
             detailImagesContainer.appendChild(img);
         });
     } else {
-        detailImagesContainer.classList.remove('hidden');
-        const img = document.createElement('img');
-        img.className = 'detail-image';
-        img.src = 'assets/pastor_boye.png';
-        img.alt = 'Fallback Photo';
-        detailImagesContainer.appendChild(img);
+        detailImagesContainer.classList.add('hidden');
     }
 
     // Handle Audio
