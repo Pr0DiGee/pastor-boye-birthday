@@ -663,7 +663,53 @@ function loadGalleryRealtime() {
                 carouselTrackContainer.prepend(img);
             }
         });
+
+        // Whenever gallery updates (new upload or initial load), scroll to start and begin animation
+        setTimeout(() => {
+            carouselTrackContainer.scrollTo({ left: 0, behavior: 'smooth' });
+            startCarouselAutoScroll();
+        }, 100);
     });
+}
+
+// Carousel Auto-Scroll Logic
+let carouselAnimationId;
+let isCarouselPaused = false;
+let carouselScrollPos = 0;
+
+function smoothScrollCarousel() {
+    if (!carouselTrackContainer || isCarouselPaused) return;
+    
+    // Smooth, continuous scroll increment (sub-pixel precision)
+    carouselScrollPos += 0.5; // Controls speed: lower is slower
+    carouselTrackContainer.scrollLeft = carouselScrollPos;
+    
+    // Check if we hit the end
+    if (carouselTrackContainer.scrollLeft >= carouselTrackContainer.scrollWidth - carouselTrackContainer.clientWidth - 1) {
+        carouselScrollPos = 0;
+        carouselTrackContainer.scrollLeft = 0;
+    }
+    
+    // Sync float position in case the user manually scrolled
+    if (Math.abs(carouselTrackContainer.scrollLeft - carouselScrollPos) > 2) {
+        carouselScrollPos = carouselTrackContainer.scrollLeft;
+    }
+    
+    carouselAnimationId = requestAnimationFrame(smoothScrollCarousel);
+}
+
+function startCarouselAutoScroll() {
+    isCarouselPaused = false;
+    cancelAnimationFrame(carouselAnimationId);
+    carouselAnimationId = requestAnimationFrame(smoothScrollCarousel);
+}
+
+if (carouselTrackContainer) {
+    // Pause animation when user is interacting with the carousel
+    carouselTrackContainer.addEventListener('mouseenter', () => isCarouselPaused = true);
+    carouselTrackContainer.addEventListener('mouseleave', () => { isCarouselPaused = false; startCarouselAutoScroll(); });
+    carouselTrackContainer.addEventListener('touchstart', () => isCarouselPaused = true, {passive: true});
+    carouselTrackContainer.addEventListener('touchend', () => { isCarouselPaused = false; startCarouselAutoScroll(); }, {passive: true});
 }
 
 // Initialize gallery

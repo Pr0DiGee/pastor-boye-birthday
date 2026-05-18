@@ -512,7 +512,6 @@ h1, h2, h3 {
     gap: var(--spacing-md);
     width: 100%;
     overflow-x: auto;
-    scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none; /* Hide scrollbar for cleaner look */
     padding-bottom: var(--spacing-sm);
@@ -528,7 +527,6 @@ h1, h2, h3 {
     border-radius: 12px;
     object-fit: cover;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    scroll-snap-align: start;
     transition: transform 0.2s ease;
 }
 
