@@ -70,17 +70,16 @@
                         <img src="img_003.jpeg" alt="Memory" class="carousel-item">
                         <img src="img_004.jpeg" alt="Memory" class="carousel-item">
                         <img src="img%20_005.jpeg" alt="Memory" class="carousel-item">
-                        <!-- Duplicate for infinite scroll loop -->
-                        <img src="img_002.png" alt="Memory" class="carousel-item">
-                        <img src="img_003.jpeg" alt="Memory" class="carousel-item">
-                        <img src="img_004.jpeg" alt="Memory" class="carousel-item">
-                        <img src="img%20_005.jpeg" alt="Memory" class="carousel-item">
                     </div>
                 </section>
 
                 <section class="hero-media">
                     <div class="video-container">
                         <div class="video-overlay"></div>
+                        <button id="btn-toggle-mute" class="mute-toggle-btn" aria-label="Toggle Sound">
+                            <svg id="icon-muted" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                            <svg id="icon-unmuted" class="hidden" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                        </button>
                         <video id="hero-video" autoplay muted loop playsinline webkit-playsinline>
                             <source src="vid_001.MP4" type="video/mp4">
                             Your browser does not support the video tag.

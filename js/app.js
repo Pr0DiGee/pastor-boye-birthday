@@ -765,29 +765,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Video Logic ---
     const heroVideo = document.getElementById('hero-video');
-    if (heroVideo) {
-        // Force the muted property directly on the DOM element initially to guarantee visual autoplay
-        heroVideo.muted = true;
-        heroVideo.play().catch(error => {
-            console.log("Autoplay prevented by iOS.", error);
-        });
+    const btnToggleMute = document.getElementById('btn-toggle-mute');
+    const iconMuted = document.getElementById('icon-muted');
+    const iconUnmuted = document.getElementById('icon-unmuted');
 
-        // Use IntersectionObserver to unmute when visible, mute when hidden
+    let userWantsAudio = false;
+
+    if (heroVideo) {
+        // Force muted initially for strict autoplay compliance
+        heroVideo.muted = true;
+        heroVideo.play().catch(error => console.log("Autoplay prevented by iOS.", error));
+
+        if (btnToggleMute) {
+            btnToggleMute.addEventListener('click', () => {
+                if (heroVideo.muted) {
+                    heroVideo.muted = false;
+                    userWantsAudio = true;
+                    iconMuted.classList.add('hidden');
+                    iconUnmuted.classList.remove('hidden');
+                } else {
+                    heroVideo.muted = true;
+                    userWantsAudio = false;
+                    iconUnmuted.classList.add('hidden');
+                    iconMuted.classList.remove('hidden');
+                }
+            });
+        }
+
+        // Use IntersectionObserver to intelligently mute when hidden to prevent ghost audio
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    heroVideo.muted = false;
-                    // If browser strictly blocks unmuting (due to no prior user interaction), 
-                    // it might pause the video. Catch this and revert to muted playing.
-                    heroVideo.play().catch(() => {
-                        heroVideo.muted = true;
-                        heroVideo.play();
-                    });
+                    if (userWantsAudio) {
+                        heroVideo.muted = false;
+                        heroVideo.play().catch(() => {
+                            // Failsafe if browser still blocks
+                            heroVideo.muted = true;
+                            userWantsAudio = false;
+                            if (iconUnmuted) iconUnmuted.classList.add('hidden');
+                            if (iconMuted) iconMuted.classList.remove('hidden');
+                            heroVideo.play();
+                        });
+                    }
                 } else {
                     heroVideo.muted = true;
                 }
             });
-        }, { threshold: 0.5 }); // Trigger when at least 50% visible
+        }, { threshold: 0.5 });
         
         observer.observe(heroVideo);
     }
