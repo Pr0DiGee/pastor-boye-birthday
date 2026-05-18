@@ -744,18 +744,51 @@ if (carouselTrackContainer) {
 // Initialize gallery
 loadGalleryRealtime();
 
-// iPhone Video Autoplay Fallback
+// iPhone Video Autoplay & Intersection Audio
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Scroll Reveal Animation ---
+    const reveals = document.querySelectorAll('.reveal');
+    if (reveals.length > 0) {
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                } else {
+                    // Optional: Remove active class when out of view so it repeats on scroll up/down
+                    entry.target.classList.remove('active');
+                }
+            });
+        }, { threshold: 0.15 });
+
+        reveals.forEach(reveal => revealObserver.observe(reveal));
+    }
+
+    // --- Video Logic ---
     const heroVideo = document.getElementById('hero-video');
     if (heroVideo) {
-        // Force the muted property directly on the DOM element for strict iOS compliance
+        // Force the muted property directly on the DOM element initially to guarantee visual autoplay
         heroVideo.muted = true;
         heroVideo.play().catch(error => {
-            console.log("Autoplay prevented by iOS. Awaiting first interaction.", error);
-            // If iOS Low Power Mode blocks it, the absolute first touch anywhere on the screen will kickstart it
-            document.body.addEventListener('touchstart', () => {
-                heroVideo.play();
-            }, { once: true, passive: true });
+            console.log("Autoplay prevented by iOS.", error);
         });
+
+        // Use IntersectionObserver to unmute when visible, mute when hidden
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    heroVideo.muted = false;
+                    // If browser strictly blocks unmuting (due to no prior user interaction), 
+                    // it might pause the video. Catch this and revert to muted playing.
+                    heroVideo.play().catch(() => {
+                        heroVideo.muted = true;
+                        heroVideo.play();
+                    });
+                } else {
+                    heroVideo.muted = true;
+                }
+            });
+        }, { threshold: 0.5 }); // Trigger when at least 50% visible
+        
+        observer.observe(heroVideo);
     }
 });

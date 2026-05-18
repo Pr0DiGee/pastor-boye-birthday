@@ -21,8 +21,9 @@
     --whatsapp-msg-border: var(--border-color);
 
     /* Typography */
-    --font-heading: 'Playfair Display', serif;
+    --font-heading: 'Cormorant Garamond', serif;
     --font-body: 'Inter', sans-serif;
+    --font-button: 'Outfit', sans-serif;
 
     /* Spacing */
     --spacing-sm: 0.5rem;
@@ -115,6 +116,19 @@ body {
     transform: translateX(0);
 }
 
+/* Scroll Reveal Animations */
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 /* General Styles */
 h1, h2, h3 {
     font-family: var(--font-heading);
@@ -136,7 +150,7 @@ h1, h2, h3 {
     padding: 0.6rem 1.2rem;
     border-radius: 50px;
     font-size: 0.9rem;
-    font-family: var(--font-body);
+    font-family: var(--font-button);
     font-weight: 600;
     cursor: pointer;
     transition: transform 0.1s ease;
@@ -178,7 +192,7 @@ h1, h2, h3 {
     padding: 0.6rem 1.2rem;
     border-radius: 50px;
     font-size: 0.9rem;
-    font-family: var(--font-body);
+    font-family: var(--font-button);
     font-weight: 600;
     cursor: pointer;
     transition: transform 0.1s ease;
@@ -219,7 +233,7 @@ h1, h2, h3 {
     color: var(--brand-primary);
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 50px;
-    font-family: var(--font-body);
+    font-family: var(--font-button);
     font-weight: 600;
     cursor: pointer;
     transition: transform 0.1s ease;
@@ -259,7 +273,7 @@ h1, h2, h3 {
     font-size: 0.9rem;
     text-decoration: underline;
     margin-top: var(--spacing-md);
-    font-family: var(--font-body);
+    font-family: var(--font-button);
 }
 
 .full-width {
@@ -494,7 +508,7 @@ h1, h2, h3 {
     cursor: pointer;
     font-size: 0.9rem;
     margin-bottom: var(--spacing-md);
-    font-family: var(--font-body);
+    font-family: var(--font-button);
 }
 
 /* Media Carousel */
