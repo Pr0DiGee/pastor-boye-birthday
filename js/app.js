@@ -676,6 +676,7 @@ function loadGalleryRealtime() {
 let carouselAnimationId;
 let isCarouselPaused = false;
 let carouselScrollPos = 0;
+let userInteractionTimeout;
 
 function smoothScrollCarousel() {
     if (!carouselTrackContainer || isCarouselPaused) return;
@@ -701,16 +702,60 @@ function smoothScrollCarousel() {
 function startCarouselAutoScroll() {
     isCarouselPaused = false;
     cancelAnimationFrame(carouselAnimationId);
+    carouselScrollPos = carouselTrackContainer.scrollLeft; // Sync right before starting
     carouselAnimationId = requestAnimationFrame(smoothScrollCarousel);
 }
 
+function pauseCarouselForInteraction() {
+    isCarouselPaused = true;
+    cancelAnimationFrame(carouselAnimationId);
+    carouselScrollPos = carouselTrackContainer.scrollLeft; // Keep synced
+    
+    clearTimeout(userInteractionTimeout);
+    // Wait 2.5 seconds after the last interaction before resuming automatically
+    userInteractionTimeout = setTimeout(() => {
+        isCarouselPaused = false;
+        carouselScrollPos = carouselTrackContainer.scrollLeft;
+        startCarouselAutoScroll();
+    }, 2500);
+}
+
 if (carouselTrackContainer) {
-    // Pause animation when user is interacting with the carousel
-    carouselTrackContainer.addEventListener('mouseenter', () => isCarouselPaused = true);
-    carouselTrackContainer.addEventListener('mouseleave', () => { isCarouselPaused = false; startCarouselAutoScroll(); });
-    carouselTrackContainer.addEventListener('touchstart', () => isCarouselPaused = true, {passive: true});
-    carouselTrackContainer.addEventListener('touchend', () => { isCarouselPaused = false; startCarouselAutoScroll(); }, {passive: true});
+    // Detect physical scrolling interactions
+    carouselTrackContainer.addEventListener('touchstart', pauseCarouselForInteraction, {passive: true});
+    carouselTrackContainer.addEventListener('touchmove', pauseCarouselForInteraction, {passive: true});
+    carouselTrackContainer.addEventListener('wheel', pauseCarouselForInteraction, {passive: true});
+    carouselTrackContainer.addEventListener('keydown', pauseCarouselForInteraction, {passive: true});
+    
+    carouselTrackContainer.addEventListener('mouseenter', () => {
+        isCarouselPaused = true;
+        cancelAnimationFrame(carouselAnimationId);
+        clearTimeout(userInteractionTimeout);
+    });
+    
+    carouselTrackContainer.addEventListener('mouseleave', () => {
+        clearTimeout(userInteractionTimeout);
+        isCarouselPaused = false;
+        carouselScrollPos = carouselTrackContainer.scrollLeft;
+        startCarouselAutoScroll();
+    });
 }
 
 // Initialize gallery
 loadGalleryRealtime();
+
+// iPhone Video Autoplay Fallback
+document.addEventListener('DOMContentLoaded', () => {
+    const heroVideo = document.getElementById('hero-video');
+    if (heroVideo) {
+        // Force the muted property directly on the DOM element for strict iOS compliance
+        heroVideo.muted = true;
+        heroVideo.play().catch(error => {
+            console.log("Autoplay prevented by iOS. Awaiting first interaction.", error);
+            // If iOS Low Power Mode blocks it, the absolute first touch anywhere on the screen will kickstart it
+            document.body.addEventListener('touchstart', () => {
+                heroVideo.play();
+            }, { once: true, passive: true });
+        });
+    }
+});
