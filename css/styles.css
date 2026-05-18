@@ -629,7 +629,7 @@ h1, h2, h3 {
 .icon-btn {
     background: none;
     border: none;
-    color: var(--accent-gold);
+    color: #fff;
     cursor: pointer;
     display: flex;
     align-items: center;
