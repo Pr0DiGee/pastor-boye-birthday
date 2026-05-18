@@ -25,19 +25,9 @@
                     <div class="hero-bg-image hero-bg-elongated"></div>
                     <div class="header-overlay">
                         <h1 class="main-title">Happy Birthday<br><span>Pastor Boye!</span></h1>
-                        <p class="subtitle">From Imprint Babcock Cell</p>
+                        <p class="subtitle">from Imprint Babcock Cell</p>
                     </div>
                 </header>
-
-                <section class="hero-media">
-                    <div class="video-container">
-                        <video id="hero-video" poster="assets/group_video_poster.png" muted loop playsinline>
-                            <!-- Placeholder collective video -->
-                            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                    </div>
-                </section>
 
                 <section class="navigation-section">
                     <button id="btn-to-upload" class="primary-btn">Send a Personal Message</button>
@@ -50,7 +40,7 @@
                     <div class="appreciation-form-container">
                         <form id="appreciation-form">
                             <input type="text" id="appreciation-author" placeholder="Your Name" required>
-                            <textarea id="appreciation-text" placeholder="Write a short appreciation note..." rows="3" maxlength="100" required></textarea>
+                            <textarea id="appreciation-text" placeholder="Write a short appreciation note..." rows="2" maxlength="100" required></textarea>
                             <div id="char-counter" style="text-align: right; font-size: 0.8rem; color: var(--text-secondary); margin-top: -0.2rem; margin-bottom: 0.5rem;">0/100</div>
                             <button type="submit" class="primary-btn small-btn">Post Note</button>
                         </form>
@@ -62,17 +52,32 @@
                     </div>
                 </section>
 
+                <h2 class="gallery-title">Gallery</h2>
+                <label for="gallery-upload" class="gallery-upload-label">
+                    Post a picture of you and Pastor to the Gallery!
+                    <input type="file" id="gallery-upload" accept="image/*" class="hidden">
+                </label>
                 <section class="carousel-section">
                     <div class="carousel-track">
-                        <img src="assets/carousel_img_1.png" alt="Memory" class="carousel-item">
-                        <img src="assets/carousel_img_2.png" alt="Memory" class="carousel-item">
-                        <img src="assets/carousel_img_3.png" alt="Memory" class="carousel-item">
-                        <img src="assets/carousel_img_4.png" alt="Memory" class="carousel-item">
+                        <img src="img_002.png" alt="Memory" class="carousel-item">
+                        <img src="img_003.jpeg" alt="Memory" class="carousel-item">
+                        <img src="img_004.jpeg" alt="Memory" class="carousel-item">
+                        <img src="img%20_005.jpeg" alt="Memory" class="carousel-item">
                         <!-- Duplicate for infinite scroll loop -->
-                        <img src="assets/carousel_img_1.png" alt="Memory" class="carousel-item">
-                        <img src="assets/carousel_img_2.png" alt="Memory" class="carousel-item">
-                        <img src="assets/carousel_img_3.png" alt="Memory" class="carousel-item">
-                        <img src="assets/carousel_img_4.png" alt="Memory" class="carousel-item">
+                        <img src="img_002.png" alt="Memory" class="carousel-item">
+                        <img src="img_003.jpeg" alt="Memory" class="carousel-item">
+                        <img src="img_004.jpeg" alt="Memory" class="carousel-item">
+                        <img src="img%20_005.jpeg" alt="Memory" class="carousel-item">
+                    </div>
+                </section>
+
+                <section class="hero-media">
+                    <div class="video-container">
+                        <div class="video-overlay"></div>
+                        <video id="hero-video" autoplay muted loop playsinline>
+                            <source src="vid_001.MP4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
                     </div>
                 </section>
             </div>
@@ -196,5 +201,10 @@
 
     <!-- Firebase v10 SDK (Module setup) -->
     <script type="module" src="js/app.js"></script>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox-modal" class="lightbox-modal hidden">
+        <img id="lightbox-img" src="" alt="Full view">
+    </div>
 </body>
 </html>

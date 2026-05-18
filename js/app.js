@@ -240,51 +240,7 @@ if (appreciationList) {
 }
 
 // --- Carousel Interactivity ---
-const carouselTrack = document.querySelector('.carousel-track');
-const carouselContainer = document.querySelector('.carousel-container');
-let currentTranslate = 0;
-let isDragging = false;
-let startX = 0;
-let prevTranslate = 0;
-
-if (carouselTrack && carouselContainer) {
-    // Scroll-linked
-    window.addEventListener('scroll', () => {
-        if (!isDragging) {
-            currentTranslate = -(window.scrollY * 0.5);
-            carouselTrack.style.transform = `translateX(${currentTranslate}px)`;
-        }
-    });
-
-    // Drag / Swipe
-    const startDrag = (e) => {
-        isDragging = true;
-        startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
-        prevTranslate = currentTranslate;
-        carouselTrack.style.transition = 'none';
-    };
-
-    const moveDrag = (e) => {
-        if (!isDragging) return;
-        const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
-        const deltaX = currentX - startX;
-        currentTranslate = prevTranslate + deltaX;
-        carouselTrack.style.transform = `translateX(${currentTranslate}px)`;
-    };
-
-    const endDrag = () => {
-        isDragging = false;
-        carouselTrack.style.transition = 'transform 0.1s ease-out';
-    };
-
-    carouselContainer.addEventListener('mousedown', startDrag);
-    carouselContainer.addEventListener('mousemove', moveDrag);
-    window.addEventListener('mouseup', endDrag);
-
-    carouselContainer.addEventListener('touchstart', startDrag, {passive: true});
-    carouselContainer.addEventListener('touchmove', moveDrag, {passive: true});
-    window.addEventListener('touchend', endDrag);
-}
+// Carousel now relies on strict native CSS horizontal scrolling (overflow-x: auto)
 
 // --- 2. Upload Portal Logic ---
 function checkVideoDuration(file) {
@@ -623,3 +579,92 @@ function escapeHTML(str) {
         }[tag] || tag)
     );
 }
+
+// --- Gallery Upload & Lightbox Logic ---
+const galleryUpload = document.getElementById('gallery-upload');
+const carouselTrackContainer = document.querySelector('.carousel-track');
+const lightboxModal = document.getElementById('lightbox-modal');
+const lightboxImg = document.getElementById('lightbox-img');
+
+if (galleryUpload) {
+    galleryUpload.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const CLOUD_NAME = "dxmgapcwb";
+        const UPLOAD_PRESET = "gallery_uploads";
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', UPLOAD_PRESET);
+        
+        try {
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            
+            if (data.secure_url) {
+                await addDoc(collection(db, "gallery"), {
+                    imageUrl: data.secure_url,
+                    createdAt: Date.now()
+                });
+            } else {
+                console.error("Cloudinary upload failed:", data);
+                alert("Failed to upload image. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error uploading to Cloudinary:", error);
+            alert("Error uploading image. Please check your connection.");
+        } finally {
+            galleryUpload.value = ''; // Reset input to allow consecutive identical uploads
+        }
+    });
+}
+
+// Event Delegation for Lightbox
+if (carouselTrackContainer && lightboxModal && lightboxImg) {
+    carouselTrackContainer.addEventListener('click', (e) => {
+        if (e.target.tagName.toLowerCase() === 'img') {
+            lightboxImg.src = e.target.src;
+            lightboxModal.classList.remove('hidden');
+        }
+    });
+
+    lightboxModal.addEventListener('click', () => {
+        lightboxModal.classList.add('hidden');
+        lightboxImg.src = '';
+    });
+}
+
+// Load Gallery from Firebase Realtime
+function loadGalleryRealtime() {
+    if (!carouselTrackContainer) return;
+    const q = query(collection(db, "gallery"), orderBy("createdAt", "desc"));
+    onSnapshot(q, (snapshot) => {
+        // Remove old dynamic images
+        const oldDynamicImages = carouselTrackContainer.querySelectorAll('.dynamic-gallery-img');
+        oldDynamicImages.forEach(img => img.remove());
+        
+        const docs = snapshot.docs.slice().reverse();
+        // Reverse so the newest item is prepended last, making it first in the DOM
+        docs.forEach((doc) => {
+            const data = doc.data();
+            if (data.imageUrl) {
+                let finalUrl = data.imageUrl;
+                // Cloudinary handles format conversion if we just change the extension
+                finalUrl = finalUrl.replace(/\.heic$/i, '.jpg');
+                
+                const img = document.createElement('img');
+                img.src = finalUrl;
+                img.alt = 'User uploaded memory';
+                img.className = 'carousel-item dynamic-gallery-img';
+                carouselTrackContainer.prepend(img);
+            }
+        });
+    });
+}
+
+// Initialize gallery
+loadGalleryRealtime();
